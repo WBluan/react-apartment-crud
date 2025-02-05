@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import { fetchApartments, fetchBlocks } from "../../services/api";
 import BlockList from "./BlockList";
+import { useAuth } from "../../context/AuthContext";
 
 
 
 export default function Condominium() {
+    const { token } = useAuth();
     const [blocks, setBlocks] = useState([]);
     const [apartments, setApartments] = useState([]);
 
     useEffect(() => {
-        fetchBlocks().then((data) => setBlocks(data.data || []));
-    }, []);
+        if (token) {
+            fetchBlocks(token).then((data) => setBlocks(data.data || []));
+        }
+    }, [token]);
     
     const handleFetchApartments = (blockId) => {
         if (apartments[blockId]) return;
 
-        fetchApartments(blockId).then((data) => {
+        fetchApartments(blockId, token).then((data) => {
             setApartments((prev) => ({
                 ...prev,
                 [blockId]: data.data,
